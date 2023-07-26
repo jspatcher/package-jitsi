@@ -106,19 +106,24 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         audio?.pause();
     };
     handleUserLeft = (id: string) => {
-        [...this._.streamMap[id]].forEach(node => node.disconnect());
-        [...this._.audioMap[id]].forEach(audio => audio.pause());
-        this._.streamMap[id].clear();
-        this._.audioMap[id].clear();
+        if (this._.streamMap[id]) {
+            [...this._.streamMap[id]].forEach(node => node.disconnect());
+            this._.streamMap[id].clear();
+        }
+        if (this._.audioMap[id]) {
+            [...this._.audioMap[id]].forEach(audio => audio.pause());
+            this._.audioMap[id].clear();
+        }
     }
-    handleConferenceJoined = (room: JitsiConference) => {
+    handleConferenceJoined = async () => {
         const [track] = JitsiMeetJS.util.RTC.createLocalTracks([{
             mediaType: "audio",
             stream: this._.audioInStreamNode.stream,
             track: this._.audioInStreamNode.stream.getAudioTracks()[0]
         }]);
         this._.localTrack = track;
-        room.addTrack(track);
+        this._.room._setupNewTrack(track);
+        await this._.room.addTrack(track);
         track.unmute();
     };
     handleMessageReceived = (id: string, message: string, timestamp: number) => {
@@ -132,7 +137,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         this.outlet(1, room);
         room.on(JitsiMeetJS.events.conference.TRACK_ADDED, this.handleRemoteTrackAdded);
         room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, this.handleRemoteTrackRemoved);
-        room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, () => this.handleConferenceJoined(room));
+        room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, this.handleConferenceJoined);
         // room.on(JitsiMeetJS.events.conference.USER_JOINED, id => console.log('user join'));
         room.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, this.handleMessageReceived);
         room.on(JitsiMeetJS.events.conference.USER_LEFT, this.handleUserLeft);
@@ -148,6 +153,11 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         this.handleConnectionDisconnect();
     };
     handleConnectionDisconnect = async () => {
+        this._.room?.off(JitsiMeetJS.events.conference.TRACK_ADDED, this.handleRemoteTrackAdded);
+        this._.room?.off(JitsiMeetJS.events.conference.TRACK_REMOVED, this.handleRemoteTrackRemoved);
+        this._.room?.off(JitsiMeetJS.events.conference.CONFERENCE_JOINED, this.handleConferenceJoined);
+        this._.room?.off(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, this.handleMessageReceived);
+        this._.room?.off(JitsiMeetJS.events.conference.USER_LEFT, this.handleUserLeft);
         this._.connection?.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, this.handleConnectionSuccess);
         this._.connection?.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, this.handleConnectionFailed);
         this._.connection?.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, this.handleConnectionDisconnect);
@@ -159,10 +169,13 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
             [...this._.audioMap[id]].forEach(audio => audio.pause());
             this._.audioMap[id].clear();
         }
-        this._.connection = undefined;
-        this._.room = undefined;
         await this._.localTrack?.mute();
         await this._.localTrack?.dispose();
+        await this._.room?.leave();
+        await this._.connection?.disconnect();
+        this._.localTrack = undefined;
+        this._.connection = undefined;
+        this._.room = undefined;
     };
     connect = () => {
         const connection = new JitsiMeetJS.JitsiConnection(null, null, serverOptions);
@@ -193,8 +206,6 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         });
         this.on("argsUpdated", async ({ args }) => {
             await this.handleConnectionDisconnect();
-            await this._.room?.leave();
-            await this._.connection?.disconnect();
             this.connect();
         });
         this.on("propsUpdated", ({ props: { username } }) => {
