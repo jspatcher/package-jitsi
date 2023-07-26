@@ -49238,7 +49238,7 @@ class Meeting extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
       this.handleConnectionDisconnect();
     };
     this.handleConnectionDisconnect = async () => {
-      var _a, _b, _c, _d;
+      var _a, _b, _c, _d, _e;
       (_a = this._.connection) == null ? void 0 : _a.removeEventListener(_shren_lib_jitsi_meet__WEBPACK_IMPORTED_MODULE_0__["default"].events.connection.CONNECTION_ESTABLISHED, this.handleConnectionSuccess);
       (_b = this._.connection) == null ? void 0 : _b.removeEventListener(_shren_lib_jitsi_meet__WEBPACK_IMPORTED_MODULE_0__["default"].events.connection.CONNECTION_FAILED, this.handleConnectionFailed);
       (_c = this._.connection) == null ? void 0 : _c.removeEventListener(_shren_lib_jitsi_meet__WEBPACK_IMPORTED_MODULE_0__["default"].events.connection.CONNECTION_DISCONNECTED, this.handleConnectionDisconnect);
@@ -49252,7 +49252,8 @@ class Meeting extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
       }
       this._.connection = void 0;
       this._.room = void 0;
-      await ((_d = this._.localTrack) == null ? void 0 : _d.dispose());
+      await ((_d = this._.localTrack) == null ? void 0 : _d.mute());
+      await ((_e = this._.localTrack) == null ? void 0 : _e.dispose());
     };
     this.connect = () => {
       const connection = new _shren_lib_jitsi_meet__WEBPACK_IMPORTED_MODULE_0__["default"].JitsiConnection(null, null, _ServerOptions__WEBPACK_IMPORTED_MODULE_3__["default"]);
@@ -49267,7 +49268,7 @@ class Meeting extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
     super.subscribe();
     this.on("preInit", () => {
       this.inlets = 1;
-      this.outlets = 1;
+      this.outlets = 2;
       this.inletAudioConnections = [{ node: this._.audioInStreamNode, index: 0 }];
       this.outletAudioConnections = [{ node: this._.audioOutGainNode, index: 0 }];
     });
@@ -79253,7 +79254,7 @@ const v5 = _dist_index_js__WEBPACK_IMPORTED_MODULE_0__.v5;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@jspatcher/package-jitsi","version":"1.0.0","description":"The Jitsi package for JSPatcher","main":"dist/index.js","scripts":{"build":"webpack --mode development","build-watch":"webpack --mode development --watch --stats-children"},"keywords":["jspatcher"],"jspatcher":{"isJSPatcherPackage":true,"thumbnail":"","jspatpkg":"index.jspatpkg.js"},"author":"Fr0stbyteR","license":"GPL-3.0-or-later","repository":"https://github.com/jspatcher/package-std","devDependencies":{"@jspatcher/jspatcher":"^0.0.10","clean-webpack-plugin":"^4.0.0-alpha.0","esbuild-loader":"^2.15.1","typescript":"^4.4.2","webpack":"^5.51.1","webpack-cli":"^4.8.0"},"dependencies":{"@shren/lib-jitsi-meet":"file:../../lib-jitsi-meet"}}');
+module.exports = JSON.parse('{"name":"@jspatcher/package-jitsi","version":"1.0.0","description":"The Jitsi package for JSPatcher","main":"dist/index.js","scripts":{"build":"webpack --mode development","build-watch":"webpack --mode development --watch --stats-children"},"keywords":["jspatcher"],"jspatcher":{"isJSPatcherPackage":true,"thumbnail":"","jspatpkg":"index.jspatpkg.js"},"author":"Fr0stbyteR","license":"GPL-3.0-or-later","repository":"https://github.com/jspatcher/package-jitsi","devDependencies":{"@jspatcher/jspatcher":"^0.0.10","@shren/lib-jitsi-meet":"file:../../lib-jitsi-meet","clean-webpack-plugin":"^4.0.0-alpha.0","esbuild-loader":"^2.15.1","typescript":"^4.4.2","webpack":"^5.51.1","webpack-cli":"^4.8.0"}}');
 
 /***/ })
 

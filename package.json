@@ -17,16 +17,14 @@
   },
   "author": "Fr0stbyteR",
   "license": "GPL-3.0-or-later",
-  "repository": "https://github.com/jspatcher/package-std",
+  "repository": "https://github.com/jspatcher/package-jitsi",
   "devDependencies": {
     "@jspatcher/jspatcher": "^0.0.10",
+    "@shren/lib-jitsi-meet": "file:../../lib-jitsi-meet",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "esbuild-loader": "^2.15.1",
     "typescript": "^4.4.2",
     "webpack": "^5.51.1",
     "webpack-cli": "^4.8.0"
-  },
-  "dependencies": {
-    "@shren/lib-jitsi-meet": "file:../../lib-jitsi-meet"
   }
 }

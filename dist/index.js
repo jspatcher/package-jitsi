@@ -27,7 +27,7 @@ __webpack_require__.r(__webpack_exports__);
   \**********************/
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@jspatcher/package-jitsi","version":"1.0.0","description":"The Jitsi package for JSPatcher","main":"dist/index.js","scripts":{"build":"webpack --mode development","build-watch":"webpack --mode development --watch --stats-children"},"keywords":["jspatcher"],"jspatcher":{"isJSPatcherPackage":true,"thumbnail":"","jspatpkg":"index.jspatpkg.js"},"author":"Fr0stbyteR","license":"GPL-3.0-or-later","repository":"https://github.com/jspatcher/package-std","devDependencies":{"@jspatcher/jspatcher":"^0.0.10","clean-webpack-plugin":"^4.0.0-alpha.0","esbuild-loader":"^2.15.1","typescript":"^4.4.2","webpack":"^5.51.1","webpack-cli":"^4.8.0"},"dependencies":{"@shren/lib-jitsi-meet":"file:../../lib-jitsi-meet"}}');
+module.exports = JSON.parse('{"name":"@jspatcher/package-jitsi","version":"1.0.0","description":"The Jitsi package for JSPatcher","main":"dist/index.js","scripts":{"build":"webpack --mode development","build-watch":"webpack --mode development --watch --stats-children"},"keywords":["jspatcher"],"jspatcher":{"isJSPatcherPackage":true,"thumbnail":"","jspatpkg":"index.jspatpkg.js"},"author":"Fr0stbyteR","license":"GPL-3.0-or-later","repository":"https://github.com/jspatcher/package-jitsi","devDependencies":{"@jspatcher/jspatcher":"^0.0.10","@shren/lib-jitsi-meet":"file:../../lib-jitsi-meet","clean-webpack-plugin":"^4.0.0-alpha.0","esbuild-loader":"^2.15.1","typescript":"^4.4.2","webpack":"^5.51.1","webpack-cli":"^4.8.0"}}');
 
 /***/ })
 

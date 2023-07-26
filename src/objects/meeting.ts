@@ -176,7 +176,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         super.subscribe();
         this.on("preInit", () => {
             this.inlets = 1;
-            this.outlets = 1;
+            this.outlets = 2;
             this.inletAudioConnections = [{ node: this._.audioInStreamNode, index: 0 }];
             this.outletAudioConnections = [{ node: this._.audioOutGainNode, index: 0 }];
         });
