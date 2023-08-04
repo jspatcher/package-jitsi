@@ -293,6 +293,7 @@ class Meeting extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
       await ((_b = this._.connection) == null ? void 0 : _b.disconnect());
     });
     this.on("inlet", async ({ data, inlet }) => {
+      var _a;
       if (inlet === 0) {
         if ((0,_sdk__WEBPACK_IMPORTED_MODULE_2__.isBang)(data)) {
           if (!this._.connection)
@@ -308,7 +309,7 @@ class Meeting extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
             if (data.userId) {
               this._.room.sendMessage(data.message, data.userId);
             } else {
-              const id = this._.room.getParticipants().find((p) => p.getDisplayName() === data.username).getId();
+              const id = (_a = this._.room.getParticipants().find((p) => p.getDisplayName() === data.username)) == null ? void 0 : _a.getId();
               if (id)
                 this._.room.sendMessage(data.message, id);
             }

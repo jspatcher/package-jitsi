@@ -238,7 +238,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
                         if (data.userId) {
                             this._.room.sendMessage(data.message, data.userId);
                         } else {
-                            const id = this._.room.getParticipants().find(p => p.getDisplayName() === data.username).getId();
+                            const id = this._.room.getParticipants().find(p => p.getDisplayName() === data.username)?.getId();
                             if (id) this._.room.sendMessage(data.message, id);
                         }
                     }
