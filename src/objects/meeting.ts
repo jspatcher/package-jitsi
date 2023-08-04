@@ -26,9 +26,11 @@ interface IS {
 }
 
 interface TextMessage {
-    username: string;
+    username?: string;
+    userId?: string;
     message: string;
-    timestamp: number;
+    timestamp?: number;
+    private?: boolean;
 }
 
 export default class Meeting extends JitsiObject<[string | TextMessage], [TextMessage, JitsiConference], [string], P> {
@@ -49,7 +51,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         type: "string",
         optional: true,
         description: "Jitsi Meeting Name",
-        default: `jspatcher${new Date().toISOString().slice(0, 10).replace("-", "")}`
+        default: `jspatcher${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`
     }];
     static props: IPropsMeta<P> = {
         opusMaxAverageBitrate: {
@@ -126,9 +128,13 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         await this._.room.addTrack(track);
         track.unmute();
     };
-    handleMessageReceived = (id: string, message: string, timestamp: number) => {
-        const username = this._.room.getParticipantById(id)?.getDisplayName();
-        this.outlet(0, { username, message, timestamp });
+    handleMessageReceived = (userId: string, message: string, timestamp: number) => {
+        const username = this._.room.getParticipantById(userId)?.getDisplayName();
+        this.outlet(0, { username, userId, message, timestamp, private: false });
+    };
+    handlePrivateMessageReceived = (userId: string, message: string, timestamp: number) => {
+        const username = this._.room.getParticipantById(userId)?.getDisplayName();
+        this.outlet(0, { username, userId, message, timestamp, private: true });
     };
     handleConnectionSuccess = () => {
         const confOptions = {};        
@@ -140,6 +146,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, this.handleConferenceJoined);
         // room.on(JitsiMeetJS.events.conference.USER_JOINED, id => console.log('user join'));
         room.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, this.handleMessageReceived);
+        room.on(JitsiMeetJS.events.conference.PRIVATE_MESSAGE_RECEIVED, this.handlePrivateMessageReceived);
         room.on(JitsiMeetJS.events.conference.USER_LEFT, this.handleUserLeft);
         // room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, track => console.log(`${track.getType()} - ${track.isMuted()}`));
         // room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
@@ -157,6 +164,7 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
         this._.room?.off(JitsiMeetJS.events.conference.TRACK_REMOVED, this.handleRemoteTrackRemoved);
         this._.room?.off(JitsiMeetJS.events.conference.CONFERENCE_JOINED, this.handleConferenceJoined);
         this._.room?.off(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, this.handleMessageReceived);
+        this._.room?.off(JitsiMeetJS.events.conference.MESSAGE_RECEIVED, this.handlePrivateMessageReceived);
         this._.room?.off(JitsiMeetJS.events.conference.USER_LEFT, this.handleUserLeft);
         this._.connection?.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, this.handleConnectionSuccess);
         this._.connection?.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, this.handleConnectionFailed);
@@ -220,14 +228,19 @@ export default class Meeting extends JitsiObject<[string | TextMessage], [TextMe
             if (inlet === 0) {
                 if (isBang(data)) {
                     if (!this._.connection) this.connect();
+                    else this.outlet(1, this._.room);
                 } else if (typeof data === "string") {
                     if (this._.room) {
                         this._.room.sendMessage(data);
                     }
                 } else if (typeof data === "object") {
                     if (this._.room) {
-                        const id = this._.room.getParticipants().find(p => p.getDisplayName() === data.username).getId();
-                        if (id) this._.room.sendMessage(data.message, id);
+                        if (data.userId) {
+                            this._.room.sendMessage(data.message, data.userId);
+                        } else {
+                            const id = this._.room.getParticipants().find(p => p.getDisplayName() === data.username).getId();
+                            if (id) this._.room.sendMessage(data.message, id);
+                        }
                     }
                 }
             }
